@@ -1,0 +1,31 @@
+.page-view {
+  height: 100vh;
+  /* background-color: red; */
+}
+
+.header {
+  height: 40vh;
+  background-color: green;
+}
+
+.list-container {
+  position: relative;
+  height: var(--total-height);
+}
+
+.item {
+  box-sizing: border-box;
+  height: 50px;
+  text-align: center;
+  line-height: 50px;
+  border-bottom: 1px solid #000;
+  position: absolute;
+  left: 0;
+  right: 0;
+  will-change: transform;
+}
+
+.load-more-btn {
+  text-align: center;
+  padding: 10px 0;
+}

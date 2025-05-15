@@ -1,0 +1,32 @@
+<!--index.wxml-->
+
+<scroll-view
+  scroll-y="true"
+  bindscroll="onScroll"
+  bindscrolltolower="loadMore"
+  lower-threshold="50"
+  class="page-view"
+>
+  <view class="header">header</view>
+
+  <view
+    class="list-container"
+    style="--total-height: {{ itemHeight * loadedItems.length }}px"
+  >
+    <view
+      class="item"
+      wx:for="{{ visibleItems }}"
+      wx:key="{{ item.item }}"
+      style="transform: {{ item.transform }}"
+    >
+      {{ item.item }}
+    </view>
+  </view>
+
+  <view
+    class="load-more-btn"
+    bind:tap="handleLoadMore"
+  >
+    加载更多
+  </view>
+</scroll-view>
