@@ -45,6 +45,18 @@ Page({
     });
   },
 
+  getInitialData() {
+    const initData = dataSource.slice(0, PAGE_SIZE);
+    this.setData(
+      {
+        loadedItems: initData
+      },
+      () => {
+        this.getRenderedItems();
+      }
+    );
+  },
+
   throttleScroll(e: WechatMiniprogram.CustomEvent) {
     const { scrollTop } = e.detail;
     this._scrollTop = scrollTop;
@@ -166,18 +178,6 @@ Page({
           });
         }
         console.log('loadedItems:', this.data.loadedItems);
-      }
-    );
-  },
-
-  getInitialData() {
-    const initData = dataSource.slice(0, PAGE_SIZE);
-    this.setData(
-      {
-        loadedItems: initData
-      },
-      () => {
-        this.getRenderedItems();
       }
     );
   }
