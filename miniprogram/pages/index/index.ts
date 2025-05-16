@@ -35,10 +35,6 @@ Page({
 
   throttledRender: null as any,
 
-  get totalHeight() {
-    return this.data.loadedItems.length * ITEM_HEIGHT;
-  },
-
   onReady() {
     this.getInitialData();
   },
