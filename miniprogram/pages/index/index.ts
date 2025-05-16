@@ -7,7 +7,7 @@ const PAGE_SIZE = 50;
 const ITEM_HEIGHT = 50;
 
 // 可视区域前后缓冲区item个数
-const BUFFER_SIZE = 0;
+const BUFFER_SIZE = 10;
 
 const throttle = (fn: () => void, delay = 200) => {
   let timer: number | null = null;
@@ -128,14 +128,12 @@ Page({
 
     const adjustedScrollTop = scrollTop - headerHeight;
 
-    const startIndex = Math.max(
-      0,
-      Math.floor(adjustedScrollTop / ITEM_HEIGHT) - BUFFER_SIZE
-    );
+    const _startIndex = Math.floor(adjustedScrollTop / ITEM_HEIGHT);
+    const startIndex = Math.max(0, _startIndex - BUFFER_SIZE);
 
     const endIndex = Math.min(
       loadedItems.length - 1,
-      startIndex + visibleItemCount + BUFFER_SIZE
+      _startIndex + visibleItemCount + BUFFER_SIZE
     );
 
     console.log('startIndex', startIndex);
