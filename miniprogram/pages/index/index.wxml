@@ -4,7 +4,7 @@
 <scroll-view
   scroll-y="true"
   bindscroll="throttleScroll"
-  bindscrolltolower="loadMore"
+  bindscrolltolower="handleLoadMore"
   lower-threshold="60"
   class="page-view"
 >
@@ -27,9 +27,9 @@
   </view>
 
   <view
-    class="load-more-btn"
-    bind:tap="handleLoadMore"
+    class="no-more"
+    wx:if="{{ showNoMore }}"
   >
-    加载更多
+    没有更多了～
   </view>
 </scroll-view>

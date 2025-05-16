@@ -1,5 +1,5 @@
 // 所有的数据
-const dataSource = [...Array(10000)].map((_, i) => i + 1);
+const dataSource = [...Array(200)].map((_, i) => i + 1);
 
 const PAGE_SIZE = 50;
 
@@ -26,8 +26,7 @@ Page({
     loadedItems: [] as number[],
     // 应该渲染的数据
     renderedItems: [] as { data: number; transform: string }[],
-    // 是否显示加载更多按钮
-    showMoreBtn: true,
+    showNoMore: false,
     itemHeight: ITEM_HEIGHT
   },
 
@@ -113,7 +112,7 @@ Page({
           renderedItems: _visibleItems
         },
         () => {
-          console.log('visibleItems1', this.data.renderedItems);
+          console.log('Items1', this.data.renderedItems);
         }
       );
       return;
@@ -150,33 +149,29 @@ Page({
         renderedItems: _visibleItems
       },
       () => {
-        console.log('visibleItems2', this.data.renderedItems);
+        console.log('Items2', this.data.renderedItems);
       }
     );
   },
 
   handleLoadMore() {
-    console.log('加载更多');
+    if (this.data.showNoMore) return;
+    const startIndex = this.data.loadedItems.length;
+    const endIndex = Math.min(startIndex + PAGE_SIZE, dataSource.length);
+    const newItems = dataSource.slice(startIndex, endIndex);
     this.setData(
       {
-        loadedItems: [
-          ...this.data.loadedItems,
-          ...dataSource.slice(
-            this.data.loadedItems.length,
-            this.data.loadedItems.length + PAGE_SIZE
-          )
-        ]
+        loadedItems: [...this.data.loadedItems, ...newItems]
       },
       () => {
-        console.log('加载更多后的 loadedItems:', this.data.loadedItems);
+        if (endIndex === dataSource.length) {
+          this.setData({
+            showNoMore: true
+          });
+        }
+        console.log('loadedItems:', this.data.loadedItems);
       }
     );
-  },
-
-  loadMore() {
-    console.log('11', 11);
-    // this.handleLoadMore();
-    // this.getRenderedItems();
   },
 
   getInitialData() {
