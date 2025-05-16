@@ -30,9 +30,6 @@ Page({
     itemHeight: ITEM_HEIGHT
   },
 
-  // 滚动位置
-  _scrollTop: 0,
-
   throttledRender: null as any,
 
   onReady() {
@@ -57,78 +54,49 @@ Page({
     );
   },
 
-  throttleScroll(e: WechatMiniprogram.CustomEvent) {
-    const { scrollTop } = e.detail;
-    this._scrollTop = scrollTop;
+  throttleScroll() {
     this.throttledRender();
   },
 
-  getHeaderHeight(): Promise<number> {
+  getListContainerBounding(): Promise<{ containerTop: number }> {
     return new Promise(resolve => {
       const query = wx.createSelectorQuery();
-      query.select('.header').boundingClientRect();
+      query.select('.list-container').boundingClientRect();
       query.exec(res => {
-        const headerHeight = res[0].height;
-        resolve(headerHeight);
-      });
-    });
-  },
-
-  getScrollViewHeight(): Promise<number> {
-    return new Promise(resolve => {
-      const query = wx.createSelectorQuery();
-      query.select('.page-view').boundingClientRect();
-      query.exec(res => {
-        const containerHeight = res[0].height;
-        resolve(containerHeight);
+        const containerTop = res[0].top;
+        resolve({ containerTop });
       });
     });
   },
 
   async getRenderedItems() {
     const { loadedItems } = this.data;
-    const scrollTop = this._scrollTop;
-    const [headerHeight, containerHeight] = await Promise.all([
-      this.getHeaderHeight(),
-      this.getScrollViewHeight()
-    ]);
-    console.log('containerHeight:', containerHeight);
-    console.log('scrollTop:', scrollTop);
-    console.log('headerHeight:', headerHeight);
+    const { containerTop } = await this.getListContainerBounding();
 
     const windowInfo = wx.getWindowInfo();
     const windowHeight = windowInfo.windowHeight;
 
     // 展示内容视口高度
-    const viewHeight = Math.min(
-      containerHeight - headerHeight + scrollTop,
-      windowHeight
-    );
-
+    const viewHeight = Math.min(windowHeight - containerTop, windowHeight);
     console.log('viewHeight', viewHeight);
+
     const visibleItemCount = Math.ceil(viewHeight / ITEM_HEIGHT);
 
-    if (scrollTop < headerHeight) {
+    console.log('visibleItemCount:', visibleItemCount);
+    if (containerTop > 0) {
       const _items = loadedItems.slice(0, visibleItemCount + BUFFER_SIZE);
       const _visibleItems = _items.map((item, index) => ({
         data: item,
         transform: `translateY(${index * ITEM_HEIGHT}px)`
       }));
 
-      this.setData(
-        {
-          renderedItems: _visibleItems
-        },
-        () => {
-          console.log('Items1', this.data.renderedItems);
-        }
-      );
+      this.setData({ renderedItems: _visibleItems }, () => {
+        console.log('Items1', this.data.renderedItems);
+      });
       return;
     }
 
-    const adjustedScrollTop = scrollTop - headerHeight;
-
-    const _startIndex = Math.floor(adjustedScrollTop / ITEM_HEIGHT);
+    const _startIndex = Math.floor(Math.abs(containerTop) / ITEM_HEIGHT);
     const startIndex = Math.max(0, _startIndex - BUFFER_SIZE);
 
     const endIndex = Math.min(
@@ -139,25 +107,19 @@ Page({
     console.log('startIndex', startIndex);
     console.log('endIndex', endIndex);
 
-    const _visibleItems = Array.from(
-      { length: endIndex - startIndex + 1 },
-      (_, i) => {
+    const _visibleItems = loadedItems
+      .slice(startIndex, endIndex + 1)
+      .map((item, i) => {
         const index = startIndex + i;
         return {
-          data: loadedItems[index],
+          data: item,
           transform: `translateY(${index * ITEM_HEIGHT}px)`
         };
-      }
-    );
+      });
 
-    this.setData(
-      {
-        renderedItems: _visibleItems
-      },
-      () => {
-        console.log('Items2', this.data.renderedItems);
-      }
-    );
+    this.setData({ renderedItems: _visibleItems }, () => {
+      console.log('Items2', this.data.renderedItems);
+    });
   },
 
   handleLoadMore() {

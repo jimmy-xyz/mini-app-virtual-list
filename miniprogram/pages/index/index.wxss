@@ -30,8 +30,3 @@
   padding: 20px 0;
   color: #999;
 }
-
-.load-more-btn {
-  text-align: center;
-  padding: 10px 0;
-}
