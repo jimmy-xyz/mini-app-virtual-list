@@ -1,25 +1,28 @@
 <!--index.wxml-->
 
+<!-- 滚动视图 -->
 <scroll-view
   scroll-y="true"
-  bindscroll="onScroll"
+  bindscroll="throttleScroll"
   bindscrolltolower="loadMore"
-  lower-threshold="50"
+  lower-threshold="60"
   class="page-view"
 >
+  <!-- 头部 -->
   <view class="header">header</view>
 
+  <!-- 列表 -->
   <view
     class="list-container"
     style="--total-height: {{ itemHeight * loadedItems.length }}px"
   >
     <view
       class="item"
-      wx:for="{{ visibleItems }}"
-      wx:key="{{ item.item }}"
+      wx:for="{{ renderedItems }}"
+      wx:key="data"
       style="transform: {{ item.transform }}"
     >
-      {{ item.item }}
+      {{ item.data }}
     </view>
   </view>
 
